@@ -133,7 +133,7 @@
             if (!hasPasswordRecoveryToken) {
                 showMessage('This page is for resetting your password. Please request a new link from the app if yours has expired.', true);
             }
-        }, 1000); // Wait 1 second for Supabase to process the token
+        }, 10000); // Wait 1 second for Supabase to process the token
     });
 
 </script>
