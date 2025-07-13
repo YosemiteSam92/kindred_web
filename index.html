@@ -38,7 +38,7 @@
         const SUPABASE_URL = 'https://heppdnfdklfpckxzopzd.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhlcHBkbmZka2xmcGNreHpvcHpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTEyMTc0NDEsImV4cCI6MjA2Njc5MzQ0MX0.j5qZzIlVvn5evXNvomUb6qXWUm26vcGfDu8r7iNhx28';
 
-        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         // Get references to all HTML elements
         const newPasswordInput = document.getElementById('newPassword');
@@ -80,7 +80,7 @@
             try {
                 // The `updateUser` method automatically uses the access_token 
                 // from the URL fragment to authenticate the request.
-                const { data, error } = await supabase.auth.updateUser({
+                const { data, error } = await supabaseClient.auth.updateUser({
                     password: newPassword
                 });
 
