@@ -35,91 +35,107 @@
     </div>
 
     <script>
-        const SUPABASE_URL = 'https://heppdnfdklfpckxzopzd.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhlcHBkbmZka2xmcGNreHpvcHpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTEyMTc0NDEsImV4cCI6MjA2Njc5MzQ0MX0.j5qZzIlVvn5evXNvomUb6qXWUm26vcGfDu8r7iNhx28';
+    const SUPABASE_URL = 'https://heppdnfdklfpckxzopzd.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhlcHBkbmZka2xmcGNreHpvcHpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTEyMTc0NDEsImV4cCI6MjA2Njc5MzQ0MX0.j5qZzIlVvn5evXNvomUb6qXWUm26vcGfDu8r7iNhx28';
 
-        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // Get references to all HTML elements
-        const newPasswordInput = document.getElementById('newPassword');
-        const confirmPasswordInput = document.getElementById('confirmPassword');
-        const savePasswordBtn = document.getElementById('savePasswordBtn');
-        const loadingIndicator = document.getElementById('loadingIndicator');
-        const messageDisplay = document.getElementById('messageDisplay');
+    // Get references to all HTML elements
+    const newPasswordInput = document.getElementById('newPassword');
+    const confirmPasswordInput = document.getElementById('confirmPassword');
+    const savePasswordBtn = document.getElementById('savePasswordBtn');
+    const loadingIndicator = document.getElementById('loadingIndicator');
+    const messageDisplay = document.getElementById('messageDisplay');
 
-        // Function to display messages to the user
-        function showMessage(text, isError = false) {
-            messageDisplay.textContent = text;
-            messageDisplay.className = 'message ' + (isError ? 'error' : 'success');
-            messageDisplay.style.display = 'block';
+    let hasPasswordRecoveryToken = false;
+
+    // Function to display messages to the user
+    function showMessage(text, isError = false) {
+        messageDisplay.innerHTML = text; // Use innerHTML to allow for links
+        messageDisplay.className = 'message ' + (isError ? 'error' : 'success');
+        messageDisplay.style.display = 'block';
+    }
+
+    // --- Main Logic: Listen for PASSWORD_RECOVERY event ---
+    supabaseClient.auth.onAuthStateChange(async (event, session) => {
+        if (event === 'PASSWORD_RECOVERY') {
+            hasPasswordRecoveryToken = true;
+            savePasswordBtn.disabled = false;
+        }
+    });
+
+    // Function to handle the password reset logic
+    async function handleResetPassword() {
+        const newPassword = newPasswordInput.value;
+        const confirmPassword = confirmPasswordInput.value;
+
+        // --- Basic Validation ---
+        if (!newPassword || !confirmPassword) {
+            showMessage('Please fill in both password fields.', true);
+            return;
+        }
+        if (newPassword !== confirmPassword) {
+            showMessage('Passwords do not match.', true);
+            return;
+        }
+        if (newPassword.length < 6) { // Corresponds to Supabase's default kPasswordMinLength
+            showMessage('Password must be at least 6 characters long.', true);
+            return;
         }
 
-        // Function to handle the password reset logic
-        async function handleResetPassword() {
-            const newPassword = newPasswordInput.value;
-            const confirmPassword = confirmPasswordInput.value;
+        // --- UI update for loading state ---
+        savePasswordBtn.style.display = 'none';
+        loadingIndicator.style.display = 'block';
 
-            // --- Basic Validation ---
-            if (!newPassword || !confirmPassword) {
-                showMessage('Please fill in both password fields.', true);
-                return;
-            }
-            if (newPassword !== confirmPassword) {
-                showMessage('Passwords do not match.', true);
-                return;
-            }
-            if (newPassword.length < 6) { // Corresponds to kPasswordMinLength
-                showMessage('Password must be at least 6 characters long.', true);
-                return;
+        try {
+            // The `updateUser` method automatically uses the access_token
+            // from the session established by onAuthStateChange.
+            const { data, error } = await supabaseClient.auth.updateUser({
+                password: newPassword
+            });
+
+            if (error) {
+                throw error;
             }
 
-            // --- UI update for loading state ---
-            savePasswordBtn.style.display = 'none';
-            loadingIndicator.style.display = 'block';
+            showMessage('Password updated successfully! You can now return to the Kindred app.', false);
+            // Optionally, you can disable inputs after success
+            newPasswordInput.disabled = true;
+            confirmPasswordInput.disabled = true;
 
-            try {
-                // The `updateUser` method automatically uses the access_token 
-                // from the URL fragment to authenticate the request.
-                const { data, error } = await supabaseClient.auth.updateUser({
-                    password: newPassword
-                });
 
-                if (error) {
-                    throw error;
-                }
-
-                showMessage('Password updated successfully! You can now return to the Kindred app and sign in.', false);
-
-            } catch (error) {
-                console.error('Error updating password:', error);
-                // Provide a user-friendly error message
-                const friendlyMessage = error.message.includes('same as the old')
-                    ? 'Your new password cannot be the same as your old one.'
-                    : `Error: ${error.message}`;
-                showMessage(friendlyMessage, true);
-            } finally {
-                // --- Reset UI state ---
-                // We keep the loader and hide the button on success to prevent re-submission
-                if (messageDisplay.classList.contains('error')) {
-                    savePasswordBtn.style.display = 'block';
-                    loadingIndicator.style.display = 'none';
-                }
+        } catch (error) {
+            console.error('Error updating password:', error);
+            // Provide a user-friendly error message
+            const friendlyMessage = error.message.includes('same as the old')
+                ? 'Your new password cannot be the same as your old one.'
+                : `Error: ${error.message}`;
+            showMessage(friendlyMessage, true);
+        } finally {
+            // --- Reset UI state ---
+            // We keep the loader and hide the button on success to prevent re-submission
+            if (messageDisplay.classList.contains('error')) {
+                savePasswordBtn.style.display = 'block';
+                loadingIndicator.style.display = 'none';
+            } else {
+                loadingIndicator.style.display = 'none';
             }
         }
-        
-        // Attach event listener to the button
-        savePasswordBtn.addEventListener('click', handleResetPassword);
+    }
 
-        // This checks if the user landed on the page without a valid token.
-        // It runs when the page loads.
-        document.addEventListener('DOMContentLoaded', () => {
-             const hash = window.location.hash.substring(1);
-             const params = new URLSearchParams(hash);
-             if (!params.has('access_token')) {
+    // Attach event listener to the button
+    savePasswordBtn.addEventListener('click', handleResetPassword);
+
+    // Check if a token was ever found after a short delay
+    document.addEventListener('DOMContentLoaded', () => {
+        savePasswordBtn.disabled = true; // Disable by default
+        setTimeout(() => {
+            if (!hasPasswordRecoveryToken) {
                 showMessage('This page is for resetting your password. Please request a new link from the app if yours has expired.', true);
-                savePasswordBtn.disabled = true;
-             }
-        });
-    </script>
+            }
+        }, 1000); // Wait 1 second for Supabase to process the token
+    });
+
+</script>
 </body>
 </html>
