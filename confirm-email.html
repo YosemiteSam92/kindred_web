@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kindred - Email Verified</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* Custom color variables based on "Terracotta Twilight" palette */
+        :root {
+            --primary-dark: #3F474A; /* A dark, muted slate grey with a subtle warm undertone */
+            --secondary-accent: #C75B39; /* A warm, desaturated rust orange / burnt sienna */
+            --text-light: #F0F2EB; /* A soft, warm white or light cream */
+            --error-alert: #6B8E23; /* Deep, rich olive green */
+            --secondary-accent-darker: #A04A2F; /* A slightly darker version of secondary accent for gradient */
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            /* Combined background for a subtle gradient effect */
+            background: radial-gradient(circle at top left, rgba(199, 91, 57, 0.3) 0%, transparent 40%), /* Top-left glow from secondary accent */
+                        radial-gradient(circle at bottom right, rgba(240, 242, 235, 0.1) 0%, transparent 40%), /* Bottom-right glow from text light */
+                        var(--primary-dark); /* Base dark background */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 1rem; /* Add some padding for small screens */
+            box-sizing: border-box; /* Include padding in element's total width and height */
+            overflow: hidden; /* Prevent scrollbars if gradient extends slightly beyond viewport */
+        }
+
+        .card {
+            background-color: rgba(63, 71, 74, 0.85); /* Slightly transparent primary dark for the card */
+            color: var(--text-light);
+            padding: 2.5rem;
+            border-radius: 1.5rem; /* More rounded corners for a softer look */
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3); /* Deeper shadow */
+            text-align: center;
+            max-width: 90%; /* Responsive width */
+            width: 450px; /* Max width for larger screens */
+            border: 1px solid var(--secondary-accent); /* Subtle accent border */
+            z-index: 10; /* Ensure card is above background gradient */
+            position: relative; /* Needed for z-index to work */
+        }
+
+        .header-main {
+            font-size: 2.5rem; /* Larger main header */
+            font-weight: 800; /* Made bolder for more impact */
+            margin-bottom: 1rem;
+            /* Apply gradient to text - blending accent with light for a golden shine */
+            background: linear-gradient(to right, var(--secondary-accent), var(--text-light));
+            -webkit-background-clip: text; /* For Webkit browsers */
+            background-clip: text;
+            -webkit-text-fill-color: transparent; /* For Webkit browsers */
+            color: transparent; /* Fallback for non-webkit browsers */
+            /* Removed text-shadow to remove the "foggy" effect */
+        }
+
+        .subheader {
+            font-size: 1.25rem; /* Smaller subheader font size */
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: var(--text-light); /* Ensure it remains soft white/cream */
+        }
+
+        .text-content {
+            font-size: 1.1rem; /* Readable text size */
+            line-height: 1.6;
+            color: var(--text-light);
+        }
+
+        /* Responsive adjustments for smaller screens */
+        @media (max-width: 640px) {
+            .card {
+                padding: 1.5rem;
+            }
+            .header-main {
+                font-size: 2rem;
+            }
+            .subheader {
+                font-size: 1.1rem; /* Further reduced for small screens */
+            }
+            .text-content {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1 class="header-main">Welcome to Kindred!</h1>
+        <h2 class="subheader">Your email has been verified.</h2>
+        <p class="text-content">
+            You may safely close this page and return to the Kindred app to continue your journey.
+        </p>
+    </div>
+</body>
+</html>
