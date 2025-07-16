@@ -56,7 +56,6 @@
             background-clip: text;
             -webkit-text-fill-color: transparent; /* For Webkit browsers */
             color: transparent; /* Fallback for non-webkit browsers */
-            /* Removed text-shadow to remove the "foggy" effect */
         }
 
         .subheader {
@@ -70,6 +69,16 @@
             font-size: 1.1rem; /* Readable text size */
             line-height: 1.6;
             color: var(--text-light);
+        }
+
+        /* Styling for the logo image */
+        .logo-icon {
+            width: 100px; /* Set a fixed width for the placeholder */
+            height: 100px; /* Set a fixed height for the placeholder */
+            margin-bottom: 1.5rem; /* Space between logo and main header */
+            border-radius: 50%; /* Make it circular if the actual logo is */
+            object-fit: cover; /* Ensure image covers the area without distortion */
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2); /* Subtle shadow for depth */
         }
 
         /* Responsive adjustments for smaller screens */
@@ -86,11 +95,18 @@
             .text-content {
                 font-size: 1rem;
             }
+            .logo-icon {
+                width: 80px; /* Smaller on mobile */
+                height: 80px; /* Smaller on mobile */
+            }
         }
     </style>
 </head>
 <body>
     <div class="card">
+        <!-- Placeholder for the Kindred app icon -->
+        <img src="assets/kindred_launcher_icon.png" alt="Kindred App Icon" class="logo-icon mx-auto">
+
         <h1 class="header-main">Welcome to Kindred!</h1>
         <h2 class="subheader">Your email has been verified.</h2>
         <p class="text-content">
